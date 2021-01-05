@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1oxyvg6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.3.0">
+  <bpmn:process id="pj-livelo-approval" name="pj-livelo-workflow" isExecutable="true">
+    <bpmn:startEvent id="start-event-workflow-pj-livelo" name="PJ Livelo">
+      <bpmn:outgoing>flow-init</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flow-init" sourceRef="start-event-workflow-pj-livelo" targetRef="workflow-first-step" />
+    <bpmn:serviceTask id="workflow-first-step" name="init-flow" camunda:asyncAfter="true" camunda:type="external" camunda:topic="init-flow-pj">
+      <bpmn:incoming>flow-init</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cew1xb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="send-reminder" name="send-reminder" camunda:type="external" camunda:topic="send-reminder-email">
+      <bpmn:incoming>flow-reminder-send</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="flow-reminder-send" sourceRef="job-reminder" targetRef="send-reminder" />
+    <bpmn:endEvent id="Event_1o368fi">
+      <bpmn:incoming>Flow_1wgolg3</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0q3fe1j" />
+    </bpmn:endEvent>
+    <bpmn:userTask id="activity-approval-needed" name="p1 approval" camunda:candidateGroups="p1">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="firstname" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flow-needs-approval</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wjtft4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1wjtft4" sourceRef="activity-approval-needed" targetRef="gateway-p1" />
+    <bpmn:sequenceFlow id="Flow_1wgolg3" sourceRef="finish-flow" targetRef="Event_1o368fi" />
+    <bpmn:serviceTask id="finish-flow" name="finish-flow" camunda:type="external" camunda:topic="finish-flow">
+      <bpmn:incoming>flow-amount-else</bpmn:incoming>
+      <bpmn:incoming>Flow_1ritns5</bpmn:incoming>
+      <bpmn:incoming>Flow_0ybmfga</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wgolg3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1cew1xb" sourceRef="workflow-first-step" targetRef="business-rule-pj" />
+    <bpmn:businessRuleTask id="business-rule-pj" camunda:resultVariable="approval_needed" camunda:decisionRef="decision-pj" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_1cew1xb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mwg7p5</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="amount-conditional-gateway" name="amount-conditional-gateway">
+      <bpmn:incoming>Flow_0mwg7p5</bpmn:incoming>
+      <bpmn:incoming>Flow_0n1yw67</bpmn:incoming>
+      <bpmn:outgoing>flow-needs-approval</bpmn:outgoing>
+      <bpmn:outgoing>flow-amount-else</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0mwg7p5" sourceRef="business-rule-pj" targetRef="amount-conditional-gateway" />
+    <bpmn:sequenceFlow id="flow-needs-approval" name="flow-needs-approval" sourceRef="amount-conditional-gateway" targetRef="activity-approval-needed">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approval_needed}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow-amount-else" sourceRef="amount-conditional-gateway" targetRef="finish-flow" />
+    <bpmn:exclusiveGateway id="gateway-p1">
+      <bpmn:incoming>Flow_1wjtft4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uhczm7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ybmfga</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1uhczm7" sourceRef="gateway-p1" targetRef="Activity_01x408p">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_01x408p" name="p1 approval" camunda:candidateGroups="p2">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="secondName" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1uhczm7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gyfr8z</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0qc5sf8">
+      <bpmn:incoming>Flow_1gyfr8z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ritns5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0n1yw67</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1gyfr8z" sourceRef="Activity_01x408p" targetRef="Gateway_0qc5sf8" />
+    <bpmn:sequenceFlow id="Flow_1ritns5" sourceRef="Gateway_0qc5sf8" targetRef="finish-flow">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0n1yw67" name="else" sourceRef="Gateway_0qc5sf8" targetRef="amount-conditional-gateway" />
+    <bpmn:sequenceFlow id="Flow_0ybmfga" name="else" sourceRef="gateway-p1" targetRef="finish-flow" />
+    <bpmn:boundaryEvent id="job-reminder" name="reminder approver" cancelActivity="false" attachedToRef="activity-approval-needed">
+      <bpmn:outgoing>flow-reminder-send</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1mq8yuy">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0/20 * * * * ?</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:textAnnotation id="TextAnnotation_1ify8lf">
+      <bpmn:text>wait 15days</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1bnbfhe" sourceRef="job-reminder" targetRef="TextAnnotation_1ify8lf" />
+    <bpmn:textAnnotation id="TextAnnotation_0fno1xm">
+      <bpmn:text>waiting the approval user</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_09pewho" sourceRef="activity-approval-needed" targetRef="TextAnnotation_0fno1xm" />
+  </bpmn:process>
+  <bpmn:message id="Message_07ljq3j" name="approvalMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="pj-livelo-approval">
+      <bpmndi:BPMNShape id="TextAnnotation_0fno1xm_di" bpmnElement="TextAnnotation_0fno1xm">
+        <dc:Bounds x="1130" y="220" width="100" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_1ify8lf_di" bpmnElement="TextAnnotation_1ify8lf">
+        <dc:Bounds x="1300" y="265" width="100" height="26" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0pismwr_di" bpmnElement="flow-init">
+        <di:waypoint x="215" y="387" />
+        <di:waypoint x="270" y="387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cew1xb_di" bpmnElement="Flow_1cew1xb">
+        <di:waypoint x="370" y="387" />
+        <di:waypoint x="430" y="387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mwg7p5_di" bpmnElement="Flow_0mwg7p5">
+        <di:waypoint x="530" y="387" />
+        <di:waypoint x="595" y="387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07h2k6b_di" bpmnElement="flow-needs-approval">
+        <di:waypoint x="620" y="412" />
+        <di:waypoint x="620" y="560" />
+        <di:waypoint x="1030" y="560" />
+        <di:waypoint x="1030" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="710" y="566" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ulggvl_di" bpmnElement="flow-amount-else">
+        <di:waypoint x="620" y="362" />
+        <di:waypoint x="620" y="240" />
+        <di:waypoint x="730" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08z0a45_di" bpmnElement="flow-reminder-send">
+        <di:waypoint x="1060" y="298" />
+        <di:waypoint x="1060" y="570" />
+        <di:waypoint x="1200" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uhczm7_di" bpmnElement="Flow_1uhczm7">
+        <di:waypoint x="900" y="265" />
+        <di:waypoint x="900" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wgolg3_di" bpmnElement="Flow_1wgolg3">
+        <di:waypoint x="780" y="200" />
+        <di:waypoint x="780" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wjtft4_di" bpmnElement="Flow_1wjtft4">
+        <di:waypoint x="980" y="240" />
+        <di:waypoint x="925" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gyfr8z_di" bpmnElement="Flow_1gyfr8z">
+        <di:waypoint x="900" y="390" />
+        <di:waypoint x="900" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ritns5_di" bpmnElement="Flow_1ritns5">
+        <di:waypoint x="875" y="450" />
+        <di:waypoint x="780" y="450" />
+        <di:waypoint x="780" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n1yw67_di" bpmnElement="Flow_0n1yw67">
+        <di:waypoint x="900" y="475" />
+        <di:waypoint x="900" y="490" />
+        <di:waypoint x="720" y="490" />
+        <di:waypoint x="720" y="387" />
+        <di:waypoint x="645" y="387" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="472" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ybmfga_di" bpmnElement="Flow_0ybmfga">
+        <di:waypoint x="875" y="240" />
+        <di:waypoint x="830" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="842" y="222" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="start-event-workflow-pj-livelo">
+        <dc:Bounds x="179" y="369" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="175" y="412" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_124tbae_di" bpmnElement="workflow-first-step">
+        <dc:Bounds x="270" y="347" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12qzhi0_di" bpmnElement="business-rule-pj">
+        <dc:Bounds x="430" y="347" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0so4fya_di" bpmnElement="amount-conditional-gateway" isMarkerVisible="true">
+        <dc:Bounds x="595" y="362" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="641" y="399" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tkyxfh_di" bpmnElement="send-reminder">
+        <dc:Bounds x="1200" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0bewkha_di" bpmnElement="Event_1o368fi">
+        <dc:Bounds x="762" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1t8ccss_di" bpmnElement="activity-approval-needed">
+        <dc:Bounds x="980" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kphp9u_di" bpmnElement="finish-flow">
+        <dc:Bounds x="730" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0dno8n3_di" bpmnElement="gateway-p1" isMarkerVisible="true">
+        <dc:Bounds x="875" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zoxlvx_di" bpmnElement="Activity_01x408p">
+        <dc:Bounds x="850" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0qc5sf8_di" bpmnElement="Gateway_0qc5sf8" isMarkerVisible="true">
+        <dc:Bounds x="875" y="425" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_09pewho_di" bpmnElement="Association_09pewho">
+        <di:waypoint x="1080" y="238" />
+        <di:waypoint x="1130" y="237" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1bnbfhe_di" bpmnElement="Association_1bnbfhe">
+        <di:waypoint x="1078" y="280" />
+        <di:waypoint x="1300" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0jtib06_di" bpmnElement="job-reminder">
+        <dc:Bounds x="1042" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1078" y="305" width="44" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

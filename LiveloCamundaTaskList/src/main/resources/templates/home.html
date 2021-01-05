@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Tasklisk - Livelo</title>
+
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+
+    <script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+    <script th:src="@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
+</head>
+<body style="padding: 5px;">
+<div>
+    <div>
+        <div style="float: left;">
+            <h1><a href="/">List of Tasks - Livelo</a></h1>
+        </div>
+        <div style="float: right;">
+            <h1><a href="/createp">Create 500</a> | <a href="/createg">Create 5001</a> | <a href="/creategincident">Create Incident 5001</a></h1>
+        </div>
+    </div>
+</div>
+<div th:if="${created != null}" id="success-alert" class="alert alert-success" role="alert">
+    Task <span th:text="${taskid}">1</span> com valor <span th:text="${amount}">500</span> foi criada com suceso!
+</div>
+<div th:if="${approve != null or denied != null}" id="success-alert" class="alert alert-success" role="alert">
+    Task <span th:text="${taskid}">1</span> <span th:text="${approve != null ? 'aprovada' : 'negada'}">negada</span> com suceso!
+</div>
+<div th:if="${assign != null}" id="success-alert2" class="alert alert-success" role="alert">
+    Task <span th:text="${taskid}">1</span> <span th:text="associada">negada</span> com suceso!
+</div>
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>ID</th>
+        <th>Owner</th>
+        <th>Assigned</th>
+        <th>Amount</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}">1</td>
+        <td th:text="${task.owner}">John</td>
+        <td th:text="${task.assigned}">John</td>
+        <td th:text="${task.amount}">5000</td>
+        <td><a href="/assign" th:href="@{'/assign?id=' + ${task.taskId}}">Assign</a>    | <a href="/approve" th:if="${task.assigned != null}" th:href="@{'/approve?id=' + ${task.taskId}}">Approve</a> | <a href="/denied?id"  th:if="${task.assigned != null}" th:href="@{'/denied?id=' + ${task.taskId}}">Denied</a></td>
+    </tr>
+</table>
+</body>
+<script>
+$("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+    $("#success-alert").slideUp(500);
+});
+
+$("#success-alert2").fadeTo(2000, 500).slideUp(500, function(){
+    $("#success-alert2").slideUp(500);
+});
+</script>
+</html>

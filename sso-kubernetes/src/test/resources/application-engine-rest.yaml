@@ -1,0 +1,74 @@
+# Test configuration using spring-boot
+spring.datasource:
+  url: jdbc:h2:mem:camunda-spring-boot-test;DB_CLOSE_ON_EXIT=false
+
+spring:
+  jersey:
+    application-path: /engine-rest
+
+camunda.bpm:
+  job-execution.enabled: true
+  id-generator: simple
+  history-level: audit
+  authorization:
+    enabled: true
+  filter:
+    create: All tasks
+
+# Externalized Keycloak configuration
+keycloak:
+  # SSO Authentication requests. Send by application as redirect to the browser
+  url.auth: ${KEYCLOAK_URL_AUTH:http://localhost:9000}
+  # SSO Token requests. Send from the application to Keycloak
+  url.token: ${KEYCLOAK_URL_TOKEN:http://localhost:9000}
+  # Keycloak access for the Identity Provider plugin.
+  url.plugin: ${KEYCLOAK_URL_PLUGIN:https://localhost:9001}
+
+  # Keycloak Camunda Identity Client
+  client.id: ${KEYCLOAK_CLIENT_ID:camunda-identity-service}
+  client.secret: ${KEYCLOAK_CLIENT_SECRET:7979d2a6-eacc-43b1-afe0-54cea181fadc}
+
+# Spring Boot Security OAuth2 SSO
+spring.security:
+  oauth2:
+    client:
+      registration:
+        keycloak:
+          provider: keycloak
+          client-id: ${keycloak.client.id}
+          client-secret: ${keycloak.client.secret}
+          authorization-grant-type: authorization_code
+          redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+          scope: openid, profile, email
+      provider:
+        keycloak:
+          token-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/token
+          authorization-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/auth
+          user-info-uri: ${keycloak.url.auth}/auth/realms/camunda/protocol/openid-connect/userinfo
+          jwk-set-uri: ${keycloak.url.token}/auth/realms/camunda/protocol/openid-connect/certs
+          issuer-uri: ${keycloak.url.token}/auth/realms/camunda
+          # set user-name-attribute one of: 
+          # - sub                -> default; using keycloak ID as camunda user ID
+          # - email              -> useEmailAsCamundaUserId=true
+          # - preferred_username -> useUsernameAsCamundaUserId=true
+          user-name-attribute: email
+
+logging.level.org.springframework.security: DEBUG
+
+# Camunda Rest API
+rest.security:
+  enabled: true
+  provider: keycloak
+  required-audience: camunda-rest-api
+
+# Camunda Keycloak Identity Provider Plugin
+plugin.identity.keycloak:
+  keycloakIssuerUrl: ${keycloak.url.plugin}/auth/realms/camunda
+  keycloakAdminUrl: ${keycloak.url.plugin}/auth/admin/realms/camunda
+  clientId: ${keycloak.client.id}
+  clientSecret: ${keycloak.client.secret}
+  useEmailAsCamundaUserId: true
+  useUsernameAsCamundaUserId: false
+  useGroupPathAsCamundaGroupId: true
+  administratorGroupName: camunda-admin
+  disableSSLCertificateValidation: true

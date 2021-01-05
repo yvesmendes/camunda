@@ -1,0 +1,19 @@
+--------------- BEGIN CAMUNDA LICENSE KEY ---------------
+ZQm6dcuRX3vEpzdZ52OJaQGiakfK+rOfobXK+3jE5KL+1ytEYRqijybPq
+9An5sKoCkGG0fNfRgh7FPflADFZsz3YI196TWyEHTzjT7LinnhvMXeioS
+/KlZ8WcUZka1Aaq4vJ2DFIFSUm4yE5DencfSf7mbICC8ZA4FcC7Yqe/2F
+pO/n1OolE+qDNvNiTU4WFmxs0YnrEsFJONnxK35CNTVRETbT+/x4Z01b/
+xFUdmjFmOc89QaRx2YceFpwDwnMhvGUkgdICck1lO6T7neOQ37nqtCmIx
+46QjgALP9khr8WuOfEeT+S96lo9VeOxu1p3EdhtxDdzMvloGaICtPbRmO
+aeWRpMQR91LC83kjUcanwU18HApoMaE+868roKaMKggKYrvhXw4ErKA/S
+BmPfG4XhUYHxJDv5bkanGUHlgiO5TmxSZ5kRvFYh9+ES0heRjCVksFHoP
+OJ2Wxd1HDFU2Sak4iGwzY3HFSbUb8/+2+a+7kUZG3zMxCeDwrjabvlU1K
+HRLdhQw17kd6r05IgTASZZfp7DU+QAJJkDirKtNmJiNSSJaq/gYW1hf2M
+d9L8DSruXSHZrHyOIwBZf9aTa/xPjtgWG++47Ki5pfVOtzj+MqPfyXyrT
+pGRo1nFSQEW6veIEvg1YOxJyLGTmJEnmVoi1bPI/8yRHxeoxjtw4jGsY=;
+customer = livelo;
+expiryDate = 2021-01-01;
+cawemo = true;
+optimize = true;
+camundaBPM = true;
+---------------  END CAMUNDA LICENSE KEY  ---------------

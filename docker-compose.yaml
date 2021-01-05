@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  jboss.keycloak:
+#    build: .
+#    image: jboss/keycloak:10.0.1
+    image: gunnaraccso/keycloak.server:10.0.1
+    restart: always
+    environment:
+      TZ: Europe/Berlin
+      KEYCLOAK_USER: keycloak
+      KEYCLOAK_PASSWORD: keycloak1!
+      DB_VENDOR: h2
+    ports:
+      - "9001:8443"
+      - "9000:8080"
